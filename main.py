@@ -1,45 +1,57 @@
 from datetime import datetime
 
-class PhoneBook(object):
-    phone_book = dict() 
+class Contact(object):
     def __init__(self, name, email, number):
         self.name = name
         self.email = email
         self.number = number
         self.date_created = datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
+    def asdict(self):
+        return { 'name': self.name, 'email': self.email, 'number': str(self.number), 'date_created': self.date_created }
+
+class PhoneBook(object):
+    def __init__(self):
         self.contacts = []
-        self.phone_book[str(number)]['name'] = name
-        self.phone_book[str(number)]['email'] = email
-        self.phone_book[str(number)]['date_created'] = self.date_created
-        self.size = 0
 
-    def get(self, key: int) -> int:
-        #Add lines 11 - 14 under add method
-        if key in self.contacts:
-            return self.phone_book[str(key)]
-        else:
-            return -1
-
-    def add(self) -> None:
-        if self.number in self.contacts:
-            return False
-        self.contacts.append(str(self.number))
-        self.size += 1
+    def getContact(self, number):
+        #Get unique phone details using the given number
+        for contact in self.contacts:
+            if contact['number'] == str(number):
+                return contact
+        return None
     
-    def getAll(self) -> None:
-        return self.contacts
+    def removeContact(self, phone_number):
+        contact = self.getContact(phone_number)
+        if contact is None:
+            return False
+        self.contacts.remove(contact)
+        return True
 
+    def addContact(self, contact) -> None:
+        c = self.getContact(contact['number'])
+        #Ensure it's storing a unique number
+        if c is None:
+            self.contacts.append(contact)
+            return 'New contact added'
+        else:
+            return 'Contact already exists in this phonebook.'
+    
+    def getAllContacts(self) -> None:
+        return [ contact['number'] for contact in self.contacts]
 
-num = PhoneBook('John', 'john@doe.com', 1234)
-#print(PhoneBook.get(1234))
-#print(PhoneBook.put('John', 'john@doe.com', 1234))
-[
-'234': {
-    name,
-    email,
-    date
-}
-]
-#For every add, do
-#self.book = dict('234')
-#book.add(name) then email and date
+#it is easier to save the phone  num as a 
+#string in the contact object to avoid int overflow
+#Then parse it into a number or long int later
+
+c1 = Contact('John', 'john@doe.com', 1234) #Creates new contact
+c2 = Contact('Jane', 'jane@doe.com', 5678)
+pb1 = PhoneBook() #Create new phonebook
+pb2 = PhoneBook()
+
+print(pb1.addContact(c1.asdict())) #New contact added
+print(pb2.addContact(c2.asdict())) #New contact added
+print(pb1.getContact(1234)) #{'name': 'John', 'email': 'john@doe.com', 'number': '1234', 'date_created': '2021-12-28-14:16:52'}
+print(pb2.getContact(5678)) #{'name': 'Jane', 'email': 'jane@doe.com', 'number': '5678', 'date_created': '2021-12-28-14:16:52'}
+print(pb2.removeContact(5678)) #True
+print(pb1.getAllContacts()) #['1234']
+print(pb2.getAllContacts()) #[]
